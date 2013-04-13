@@ -20,6 +20,7 @@ namespace TravelingSalesman
         static int size = 1;
         static int[,] matrix = new int[size, size];
         static int max = 100;
+        static int newCircuitLength;
 
         /// <summary>
         /// Main entry point of the program.
@@ -30,7 +31,7 @@ namespace TravelingSalesman
             Console.Write("Please enter the filename: ");
             string filename = Console.ReadLine();
             string[] lines = File.ReadAllLines(filename);
-            int newCircuitLength = max;
+            newCircuitLength = max;
 
             /**
              * The following code Loops through and parses the input file. 
@@ -81,6 +82,7 @@ namespace TravelingSalesman
                         minCircuit = new int[size];
                         hamiltonianCircuit = new int[size + 2];
                         max = 0;
+
                         for(int k = 0; k < size; k++)
                         {
                             for(int l = 0; l < size; l++)
@@ -95,44 +97,7 @@ namespace TravelingSalesman
 
                         max = max / 2;
                         minCircuitLength = max;
-                        for (int svid = 0; svid < size; svid++)
-                        {
-                            for (int j = 0; j < size; j++)
-                            {
-                                SetVisited(ALL, false);
-                                SetVisited(0, true);
-                                ResetMinCircuit(0);
-                                newCircuitLength = GetValidCircuit(0, j);
-                                if (newCircuitLength <= minCircuitLength)
-                                {
-                                    minCircuitLength = newCircuitLength;
-                                    SetHamiltonianCircuit(minCircuitLength);
-                                }
-                            }
-                        }
-
-                        if (minCircuitLength < max)
-                        {
-                            Console.WriteLine("Minimum circuit length is: {0}", minCircuitLength);
-                            Console.Write("The circuit is: [");
-                            for (int j = 1; j < size + 2; j++)
-                            {
-                                if (j == size + 1)
-                                {
-                                    Console.Write("{0}]", hamiltonianCircuit[j]);
-                                }
-                                else
-                                {
-                                    Console.Write("{0}, ", hamiltonianCircuit[j]);
-                                }
-                            }
-
-                            Console.WriteLine("\n\n");
-                        }
-                        else
-                        {
-                            Console.WriteLine("No circuit...");
-                        }
+                        CheckMatrix();                        
                     }
                     else
                     {
@@ -174,6 +139,53 @@ namespace TravelingSalesman
         }
 
         /// <summary>
+        /// Checks the matrix for the shortest path.
+        /// </summary>
+        private static void CheckMatrix()
+        {
+            for (int svid = 0; svid < size; svid++)
+            {
+                for (int j = 0; j < size; j++)
+                {
+                    SetVisited(ALL, false);
+                    SetVisited(0, true);
+                    ResetMinCircuit(0);
+                    newCircuitLength = GetValidCircuit(0, j);
+
+                    if (newCircuitLength <= minCircuitLength)
+                    {
+                        minCircuitLength = newCircuitLength;
+                        SetHamiltonianCircuit(minCircuitLength);
+                    }
+                }
+            }
+
+            if (minCircuitLength < max)
+            {
+                Console.WriteLine("Minimum circuit length is: {0}", minCircuitLength);
+                Console.Write("The circuit is: [");
+                for (int j = 1; j < size + 2; j++)
+                {
+                    if (j == size + 1)
+                    {
+                        Console.Write("{0}]", hamiltonianCircuit[j]);
+                    }
+                    else
+                    {
+                        Console.Write("{0}, ", hamiltonianCircuit[j]);
+                    }
+                }
+
+                Console.WriteLine("\n\n");
+            }
+            else
+            {
+                Console.WriteLine("No circuit...");
+            }
+        }
+
+
+        /// <summary>
         /// Prints the matrix to the console.
         /// </summary>
         /// <param name="matrix"></param>
@@ -201,7 +213,7 @@ namespace TravelingSalesman
         /// Resets the currenct minimum circuit.
         /// </summary>
         /// <param name="start"></param>
-        static void ResetMinCircuit(int start)
+        private static void ResetMinCircuit(int start)
         {
             minCircuit[0] = start;
             for (int i = 1; i < size; i++)
@@ -215,7 +227,7 @@ namespace TravelingSalesman
         /// </summary>
         /// <param name="value"></param>
         /// <param name="flag"></param>
-        static void SetVisited(int value, bool flag)
+        private static void SetVisited(int value, bool flag)
         {
             if (value == ALL)
             {
@@ -234,7 +246,7 @@ namespace TravelingSalesman
         /// Sets the Hamiltonian Circuit.
         /// </summary>
         /// <param name="pl"></param>
-        static void SetHamiltonianCircuit(int pl)
+        private static void SetHamiltonianCircuit(int pl)
         {
             hamiltonianCircuit[0] = pl;
             for (int i = 0; i < size; i++)
@@ -251,7 +263,7 @@ namespace TravelingSalesman
         /// <param name="start"></param>
         /// <param name="next"></param>
         /// <returns></returns>
-        static int GetValidCircuit(int start, int next)
+        private static int GetValidCircuit(int start, int next)
         {
             int nextv = 0, min, vcount = 1;
             int pathLength = 0;
