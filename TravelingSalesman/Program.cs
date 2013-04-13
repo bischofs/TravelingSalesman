@@ -19,7 +19,7 @@ namespace TravelingSalesman
         static int minCircuitLength;
         static int size = 1;
         static int[,] matrix = new int[size, size];
-        static int inf = 100;
+        static int max = 100;
 
         /// <summary>
         /// Main entry point of the program.
@@ -30,11 +30,39 @@ namespace TravelingSalesman
             Console.Write("Please enter the filename: ");
             string filename = Console.ReadLine();
             string[] lines = File.ReadAllLines(filename);
-            int newCircuitLength = inf;
+            int newCircuitLength = max;
 
+            /**
+             * The following code Loops through and parses the input file. 
+             * 
+             * The file is in the following format:
+             * 
+             * 5
+             * 0,1,6
+             * 0,2,7
+             * 0,3,8
+             * 0,4,9
+             * 1,2,1
+             * 1,3,1
+             * 1,4,1
+             * 2,3,4
+             * 2,4,10
+             * 3,4,12
+             * E
+             * 
+             * The first line represents the size of the matrix.
+             * 
+             * Each line thereafter represents two connected vertices and 
+             * the weight between them.
+             * NOTE: The graph is undirected, so 0,1,6 as in above is equivalent
+             * to 1,0,6.
+             * 
+             * The "E" represents the end of a matrix's input. There can be multiple
+             * matrices within the file, the "E" is just a separator between them.
+             */
             for (int i = 0; i < lines.Length; i++)
             {
-                // 
+                // Start handling the input.
                 if (!lines[i].Contains(','))
                 {
                     int temp;
@@ -52,12 +80,12 @@ namespace TravelingSalesman
                         visited = new bool[size];
                         minCircuit = new int[size];
                         hamiltonianCircuit = new int[size + 2];
-                        inf = 0;
+                        max = 0;
                         for(int k = 0; k < size; k++)
                         {
                             for(int l = 0; l < size; l++)
                             {
-                                inf += matrix[k, l];
+                                max += matrix[k, l];
                                 if (matrix[k, l] == 0)
                                 {
                                     matrix[k, l] = 100;
@@ -65,8 +93,8 @@ namespace TravelingSalesman
                             }
                         }
 
-                        inf = inf / 2;
-                        minCircuitLength = inf;
+                        max = max / 2;
+                        minCircuitLength = max;
                         for (int svid = 0; svid < size; svid++)
                         {
                             for (int j = 0; j < size; j++)
@@ -83,7 +111,7 @@ namespace TravelingSalesman
                             }
                         }
 
-                        if (minCircuitLength < inf)
+                        if (minCircuitLength < max)
                         {
                             Console.WriteLine("Minimum circuit length is: {0}", minCircuitLength);
                             Console.Write("The circuit is: [");
@@ -146,7 +174,7 @@ namespace TravelingSalesman
         }
 
         /// <summary>
-        /// Prints the matrix out.
+        /// Prints the matrix to the console.
         /// </summary>
         /// <param name="matrix"></param>
         /// <param name="size"></param>
@@ -231,12 +259,13 @@ namespace TravelingSalesman
             minCircuit[1] = next;
             SetVisited(next, true);
             pathLength += matrix[start, next];
+
             for (int i = next; vcount < size - 1; vcount++)
             {
-                min = inf;
+                min = max;
                 for (int j = 0; j < size; j++)
                 {
-                    if (matrix[i, j] < inf && !visited[j] && matrix[i, j] <= min && matrix[i, j] != 0)
+                    if (matrix[i, j] < max && !visited[j] && matrix[i, j] <= min && matrix[i, j] != 0)
                     {
                         nextv = j;
                         min = matrix[i, j];
